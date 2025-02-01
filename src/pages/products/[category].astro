@@ -1,0 +1,55 @@
+---
+import CardProduct from "../../components/products/cardCategory";
+import ProductOverviewGrid from "../../components/products/productOverviewGrid";
+import ReviewSummaryChart from "../../components/reviews/reviewSummaryChart";
+import StoreDoubleColumn from "../../components/store/storeDoubleColumn";
+import Layout from "../../layouts/Layout.astro";
+
+import type { Product } from "../../interfaces/product";
+import fetchApi from "../../lib/strapi";
+import '../../../assets/scss/astro-ecommerce.scss';
+import Navbar from "../../components/navbar";
+
+const { category = '' } = Astro.params;
+const assetUrl = import.meta.env.STRAPI_URL;
+
+let products: Product[];
+try {
+ products = await fetchApi<Product[]>({
+    endpoint: 'products/page',
+    wrappedByKey: 'results',
+    query: {
+        category,
+    }
+});
+console.log(products);
+console.log(category);
+} catch(e) {
+    return Astro.redirect('/404');
+}
+
+console.log(import.meta.env.BASE_URL);
+---
+
+<Layout title="Product Page">
+	<main>
+    <Navbar />
+    <div class="container mt-5 ">
+        {products.map((el,i) => (
+                 <div class="col-md-6 col-lg-3">
+            <CardProduct 
+              thumb_src = {import.meta.env.STRAPI_URL+el.images[0].image.url}
+              thumb_alt = {''}
+              color = {'Black'}
+              colors = {[]}
+              title = {el.name}
+              price = {el.price}
+              position = "center"
+              redirect={import.meta.env.BASE_URL+'/products/'+category+'/'+el.slug}
+            />
+          </div>
+        ))}
+    </div>
+  </main>
+
+</Layout>

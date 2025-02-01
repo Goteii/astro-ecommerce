@@ -1,0 +1,53 @@
+---
+import CardProduct from "../../../components/products/cardCategory";
+import ProductOverviewGrid from "../../../components/products/productOverviewGrid";
+import ReviewSummaryChart from "../../../components/reviews/reviewSummaryChart";
+import StoreDoubleColumn from "../../../components/store/storeDoubleColumn";
+import Layout from "../../../layouts/Layout.astro";
+
+import type { Product } from "../../../interfaces/product";
+import fetchApi from "../../../lib/strapi";
+import '../../../../assets/scss/astro-ecommerce.scss';
+import Navbar from "../../../components/navbar";
+
+const { slug = '' } = Astro.params;
+
+let product: Product;
+try {
+ product = await fetchApi<Product>({
+    endpoint: 'products/' + slug,
+});
+} catch(e) {
+    return Astro.redirect('/404');
+}
+
+console.log(import.meta.env.BASE_URL);
+---
+
+<Layout title="Product Page">
+	<main>
+    <Navbar />
+    <div class="container mt-5 ">
+      <CardProduct 
+        thumb_src = {import.meta.env.STRAPI_URL+product.images[0].image.url}
+        thumb_alt = {''}
+        color = {'Black'}
+        colors = {[]}
+        title = {product.name}
+        price = {product.price}
+        position = "center"
+      />
+    </div>
+    <p>{product.description}</p>
+    <p>{product.briefDescription}</p>
+    <p>Cena: {product.price} PLN</p>
+    <p>Opcje: brak</p>
+    <!-- {product.options.map((option, i) => (
+      <div>{option.product_option_category}</div>
+      <select>
+        {option.product_option_category_values.map((el, i) => )}
+      </select>
+    ))} -->
+  </main>
+
+</Layout>
